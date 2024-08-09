@@ -1,7 +1,7 @@
 'use client'
-import { Box, Button, Stack, TextField } from '@mui/material'
-import Image from "next/image";
-import {useState} from "react";
+
+import { Box, Button, Stack, TextField } from '@mui/material';
+import { useState } from 'react';
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -9,22 +9,54 @@ export default function Home() {
       role: 'assistant',
       content: "Hi! I'm the Headstarter support assistant. How can I help you today?",
     },
-  ])
+  ]);
 
-
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState('');
 
   const sendMessage = async () => {
-    setMessage('')  // Clear the input field
-  setMessages((messages) => [
-    ...messages,
-    { role: 'user', content: message },  // Add the user's message to the chat
-    { role: 'assistant', content: '' },  // Add a placeholder for the assistant's response
-  ])
+    setMessage(''); // Clear the input field
 
-  //Kafai stopped at 19:30
-  // Send the message to the server
-  }
+    setMessages((messages) => [
+      ...messages,
+      { role: 'user', content: message }, // Add the user's message to the chat
+      { role: 'assistant', content: '' }, // Add a placeholder for the assistant's response
+    ]);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: [...messages, { role: 'user', content: message }] }),
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      let result = '';
+      await reader.read().then(function processText({ done, value }) {
+        if (done) {
+          return result;
+        }
+        const text = decoder.decode(value || new Int8Array(), { stream: true });
+        setMessages((messages) => {
+          const lastMessage = messages[messages.length - 1];
+          const otherMessages = messages.slice(0, messages.length - 1);
+          return [
+            ...otherMessages,
+            {
+              ...lastMessage,
+              content: lastMessage.content + text,
+            },
+          ];
+        });
+        return reader.read().then(processText);
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
 
   return (
     <Box
@@ -86,5 +118,5 @@ export default function Home() {
         </Stack>
       </Stack>
     </Box>
-  )
+  );
 }
