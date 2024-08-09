@@ -89,7 +89,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (messages.length === 0) {
+    if (messages.length == 0) {
       addMessage(1, "Hello! I'm Kazir AI. How can I assist you today?", true);
     }
     if (messages.length > 0 && !messages[messages.length - 1].isBot) {
