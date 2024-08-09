@@ -1,6 +1,4 @@
-'use client';
-
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { sendToLlama } from "./api/chat/route";
 import { FaRobot, FaUser } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -67,14 +65,15 @@ const StarryBackground = () => {
     </div>
   );
 };
+
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const chatBoxBodyRef = useRef(null);
 
-  const addMessage = (id, text, isBot) => {
-    setMessages([...messages, { id, text, isBot }]);
-  };
+  const addMessage = useCallback((id, text, isBot) => {
+    setMessages(prevMessages => [...prevMessages, { id, text, isBot }]);
+  }, []);
 
   const handleSendClick = () => {
     if (inputValue.trim() !== "") {
@@ -96,7 +95,7 @@ export default function Home() {
       sendToLlama(messages.length, inputValue.trim(), addMessage);
       setInputValue("");
     }
-  }, [messages]);
+  }, [messages, addMessage, inputValue]);
 
   useEffect(() => {
     if (chatBoxBodyRef.current) {
