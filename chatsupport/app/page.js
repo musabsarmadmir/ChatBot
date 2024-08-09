@@ -89,6 +89,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    console.log(messages);
     if (messages.length === 0) {
       addMessage(1, "Hello! I'm Kazir AI. How can I assist you today?", true);
     }
