@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { sendToLlama } from "./api/chat/route";
@@ -67,14 +67,15 @@ const StarryBackground = () => {
     </div>
   );
 };
+
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const chatBoxBodyRef = useRef(null);
 
-  const addMessage = (id, text, isBot) => {
-    setMessages([...messages, { id, text, isBot }]);
-  };
+  const addMessage = useCallback((id, text, isBot) => {
+    setMessages(prevMessages => [...prevMessages, { id, text, isBot }]);
+  }, []);
 
   const handleSendClick = () => {
     if (inputValue.trim() !== "") {
