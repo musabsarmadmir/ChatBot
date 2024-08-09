@@ -1,146 +1,76 @@
-'use client'
+'use client';
 
-import { Box, Button, Stack, TextField, Typography, IconButton } from '@mui/material';
-import { useState, useRef, useEffect } from 'react';
+import Message from "./Message";
+import { useEffect, useState, useRef } from "react";
+import { sendToLlama } from "./api/chat/route";
 
 export default function Home() {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: "Hi! I'm the Headstarter support assistant. How can I help you today?",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState("");
+  const chatBoxBodyRef = useRef(null);
 
-  const messagesEndRef = useRef(null);
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const addMessage = (id, text, isBot) => {
+    setMessages([...messages, { id, text, isBot }]);
   };
 
+  const handleSendClick = () => {
+    if (inputValue.trim() !== "") {
+      addMessage(messages.length + 1, inputValue, false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSendClick();
+    }
+  };
+  
   useEffect(() => {
-    scrollToBottom();
+    //.addMessage(1, "Hey!", false);
+    console.log(messages);
+    if(messages.length == 0 ){  addMessage(1, "Hello! How can I help you today?", true);}
+    if(messages.length > 0 && messages[messages.length-1].isBot == false) {
+      sendToLlama(messages.length,inputValue.trim(),addMessage);
+      setInputValue("");
+    }
+   
+    
   }, [messages]);
 
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const sendMessage = async () => {
-    if (!message.trim() || isLoading) return;  // Don't send empty messages
-    setIsLoading(true);
-    setMessage('');
-    setMessages((messages) => [
-      ...messages,
-      { role: 'user', content: message },
-      { role: 'assistant', content: '' },
-    ]);
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify([...messages, { role: 'user', content: message }]),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const text = decoder.decode(value, { stream: true });
-        setMessages((messages) => {
-          let lastMessage = messages[messages.length - 1];
-          let otherMessages = messages.slice(0, messages.length - 1);
-          return [
-            ...otherMessages,
-            { ...lastMessage, content: lastMessage.content + text },
-          ];
-        });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setMessages((messages) => [
-        ...messages,
-        { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
-      ]);
+  useEffect(() => {
+    if (chatBoxBodyRef.current) {
+      chatBoxBodyRef.current.scrollTop = chatBoxBodyRef.current.scrollHeight;
     }
-    setIsLoading(false);
-  };
+  }, [messages]);
 
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      sendMessage();
-    }
-  };
 
   return (
-    <Box
-      width="100vw"
-      height="100vh"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Stack
-        direction={'column'}
-        width="500px"
-        height="700px"
-        border="1px solid black"
-        p={2}
-        spacing={3}
-      >
-        <Stack
-          direction={'column'}
-          spacing={2}
-          flexGrow={1}
-          overflow="auto"
-          maxHeight="100%"
-        >
-          {messages.map((message, index) => (
-            <Box
-              key={index}
-              display="flex"
-              justifyContent={
-                message.role === 'assistant' ? 'flex-start' : 'flex-end'
-              }
-            >
-              <Box
-                bgcolor={
-                  message.role === 'assistant'
-                    ? 'primary.main'
-                    : 'secondary.main'
-                }
-                color="white"
-                borderRadius={16}
-                p={3}
-              >
-                {message.content}
-              </Box>
-            </Box>
-          ))}
-          <div ref={messagesEndRef} />
-        </Stack>
-        <Stack direction={'row'} spacing={2}>
-          <TextField
-            label="Message"
-            fullWidth
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+    <main>
+      <div className="chat-box">
+        <div className="chat-box-header">
+          <h1>AI Customer Support</h1>
+        </div>
+        <div className="chat-box-body" ref={chatBoxBodyRef}>
+          
+          {messages.map((message) => (
+              <Message
+                key={message.id}
+                text={message.text}
+                isBot={message.isBot}
+              />
+            ))}
+        </div>
+        <div className="chat-box-footer">
+          <input
+            type="text"
+            placeholder="Type your message"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            disabled={isLoading}
           />
-          <Button variant="contained" onClick={sendMessage} disabled={isLoading}>
-           {isLoading ? 'Sending...' : 'Send'}
-          </Button>
-        </Stack>
-      </Stack>
-    </Box>
+         <button type="submit" onClick={handleSendClick}>Send</button>
+        </div>
+      </div>
+    </main>
   );
 }
