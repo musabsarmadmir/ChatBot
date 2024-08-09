@@ -96,7 +96,7 @@ export default function Home() {
       sendToLlama(messages.length, inputValue.trim(), addMessage);
       setInputValue("");
     }
-  }, [messages, inputValue, addMessage]);
+  }, [messages, addMessage]);
 
   useEffect(() => {
     if (chatBoxBodyRef.current) {
