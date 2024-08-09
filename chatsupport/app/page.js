@@ -93,10 +93,10 @@ export default function Home() {
       addMessage(1, "Hello! I'm Kazir AI. How can I assist you today?", true);
     }
     if (messages.length > 0 && !messages[messages.length - 1].isBot) {
-      sendToLlama(messages.length, addMessage);
+      sendToLlama(messages.length, inputValue.trim(), addMessage);
       setInputValue("");
     }
-  }, [messages, addMessage]);
+  }, [messages, inputValue, addMessage]);
 
   useEffect(() => {
     if (chatBoxBodyRef.current) {
