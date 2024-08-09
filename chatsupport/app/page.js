@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { sendToLlama } from "./api/chat/route";
 import { FaRobot, FaUser } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -89,14 +89,14 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (messages.length == 0) {
+    if (messages.length === 0) {
       addMessage(1, "Hello! I'm Kazir AI. How can I assist you today?", true);
     }
     if (messages.length > 0 && !messages[messages.length - 1].isBot) {
       sendToLlama(messages.length, inputValue.trim(), addMessage);
       setInputValue("");
     }
-  }, [messages, inputValue, addMessage]);
+  }, [messages, addMessage, inputValue]);
 
   useEffect(() => {
     if (chatBoxBodyRef.current) {
