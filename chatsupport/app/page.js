@@ -1,3 +1,5 @@
+"use client"; // Add this at the very top of the file
+
 import { useEffect, useState, useRef, useCallback } from "react";
 import { sendToLlama } from "./api/chat/route";
 import { FaRobot, FaUser } from 'react-icons/fa';
@@ -88,14 +90,14 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (messages.length === 0) {
+    if (messages.length == 0) {
       addMessage(1, "Hello! I'm Kazir AI. How can I assist you today?", true);
     }
     if (messages.length > 0 && !messages[messages.length - 1].isBot) {
-      sendToLlama(messages.length, inputValue.trim(), addMessage);
+      sendToLlama(messages.length);
       setInputValue("");
     }
-  }, [messages, addMessage, inputValue]);
+  }, [messages, addMessage]);
 
   useEffect(() => {
     if (chatBoxBodyRef.current) {
