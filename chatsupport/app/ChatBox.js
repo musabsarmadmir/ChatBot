@@ -5,7 +5,7 @@ export default function ChatBox({children}) {
     <main>
       <div className="chat-box">
         <div className="chat-box-header">
-          <h1>AI Customer Support</h1>
+          <h1>Exo Voyage AI</h1>
         </div>
         <div className="chat-box-body">
             {children}

@@ -237,7 +237,7 @@ export default function Home() {
   // Initialize with welcome message if not already present
   useEffect(() => {
     if (messages.length === 0) {
-      setMessages([{ id: 1, text: "Hello! I'm Kazir AI. How can I assist you today?", isBot: true }]);
+      setMessages([{ id: 1, text: "Hello! I'm ExoVoyageAI. How can I assist you today?", isBot: true }]);
     }
   }, [messages]);
 
@@ -286,7 +286,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
-          🤖 Kazir AI Support
+          ExoVoyageAI
           </motion.h1>
         </div>
         <div className="chat-box-body" ref={chatBoxBodyRef}>

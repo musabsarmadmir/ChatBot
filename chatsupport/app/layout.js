@@ -4,8 +4,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "AI# Customer Support",
-  description: "To resolve your queries, we have developed an AI Customer Support system.",
+  title: " ExoVoyageAI",
+  description: "Find the best exoplanet for your journey",
 };
 
 export const viewport = {
